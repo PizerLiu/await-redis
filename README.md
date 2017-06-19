@@ -12,3 +12,12 @@ await redisExists(key)
 
 //随机返回一个键
 await redisRandomkey()
+
+//HashName 名,key 键 -> 查询哈希中的key
+await redisHmget(HashName,key)
+
+//HashName 名 -> 查询哈希中的所有键值对
+await redisHgetall(HashName)
+
+//HashName 名, 键值对（object类型） -> 存储哈希键值对
+await redisHmset(HashName,info)
