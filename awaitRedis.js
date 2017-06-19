@@ -73,7 +73,7 @@ db.redisExists = function(key){
                 if (err) {  
                     reject(err) 
                 }       
-                resolve(result)   // 键存在，返回1，否则返回0
+                resolve(reply)   // 键存在，返回1，否则返回0
             });
         })
     })
