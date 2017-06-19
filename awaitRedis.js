@@ -92,8 +92,63 @@ db.redisRandomkey = function(key){
             });
         })
     })
-}  
+} 
 
+/** 
+ * 查询哈希中的key
+ * @param HashName 
+ * @param key 键  
+ */  
+db.redisHmget = function(HashName,key){  
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.hmget(HashName, key, function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+} 
+
+/** 
+ * 查询哈希中的所有键值对
+ * @param HashName 
+ */  
+db.redisHgetall = function(HashName){  
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.hgetall(HashName, function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+} 
+
+/** 
+ * 存储哈希键值对
+ * @param HashName 
+ * @param info （object）
+ */  
+db.redisHmset = function(HashName,info){  
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.hmset(HashName, info,function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+} 
 
 /** 
  * 断开redis 
