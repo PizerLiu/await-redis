@@ -20,6 +20,7 @@ client.on('connect', function(){
   console.log('Redis连接成功.');  
 })  
 
+
 /** 
  * 添加string类型的数据 
  * @param key 键 
@@ -62,6 +63,26 @@ db.redisGet = function(key){
     }) 
 }  
 
+
+/** 
+ * 查询string类型的数据 
+ * @param key包含的键 （tweet_total_read_*）
+ */  
+db.redisKeys = function(key){  
+    //调用unref（）将允许此程序在get命令完成后立即退出。否则只要客户端 - 服务器连接存在，客户端就会挂起
+    // client.unref();
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.keys(key, function(err,result){  
+                if (err) {  
+                    reject(err)
+                }        
+                resolve(result)  
+            }); 
+        })
+    }) 
+} 
+
 /** 
  * 查询key是否存在 
  * @param key 键  
@@ -81,9 +102,8 @@ db.redisExists = function(key){
 
 /** 
  * 随机返回一个键
- * @param key 键 
  */  
-db.redisRandomkey = function(key){  
+db.redisRandomkey = function(){  
     return new Promise(async function (resolve, reject) {
         client.select(redisName.toString(), function(error){  
             client.randomkey(function (err, reply) {
@@ -92,7 +112,7 @@ db.redisRandomkey = function(key){
             });
         })
     })
-} 
+}  
 
 /** 
  * 查询哈希中的key
@@ -103,6 +123,25 @@ db.redisHmget = function(HashName,key){
     return new Promise(async function (resolve, reject) {
         client.select(redisName.toString(), function(error){  
             client.hmget(HashName, key, function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+} 
+
+/** 
+ * 删除哈希表 key 中的一个或多个指定字段
+ * @param HashName 
+ * @param key 键  
+ */  
+db.redisHdel = function(HashName,key){  
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.hdel(HashName, key, function(error, result){
                 if(error) {
                     reject(error);
                 } else {
@@ -149,6 +188,25 @@ db.redisHmset = function(HashName,info){
         })
     })
 } 
+
+/** 
+ * 删除键值对
+ * @param key 
+ */  
+db.redisDel = function(key){  
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.del(key,function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+}
+
 
 /** 
  * 断开redis 
