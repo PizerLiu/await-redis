@@ -1,11 +1,15 @@
 
+/** 
+ * redis node操作(promise)
+ * @auther pizer 
+ * @date 2017/6/19  
+ */ 
+
 var db = {};  
-var redis = require("redis");  
+var redis = require("redis");
 
 //redis连接信息
-var redisIp = "127.0.0.1"
-var redisPort = "6379"
-var redisName = "0"
+const {redisIp,redisPort,redisName} = require(process.cwd()+'/timer/lib/config.js')
 
 //redis连接
 var client = redis.createClient(redisPort, redisIp);
@@ -187,7 +191,25 @@ db.redisHmset = function(HashName,info){
             });
         })
     })
-} 
+}
+
+/**
+ * 查询哈希键值长度
+ * @param HashName
+ */
+db.redisHlen = function(HashName){
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){
+            client.hlen(HashName,function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+}
 
 /** 
  * 删除键值对
@@ -197,6 +219,24 @@ db.redisDel = function(key){
     return new Promise(async function (resolve, reject) {
         client.select(redisName.toString(), function(error){  
             client.del(key,function(error, result){
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    })
+}
+
+/** 
+ * 获得加一键值
+ * @param key 
+ */  
+db.redisIncr = function(key){  
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){  
+            client.incr(key,function(error, result){
                 if(error) {
                     reject(error);
                 } else {
