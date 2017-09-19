@@ -179,13 +179,16 @@ db.redisHgetall = function(HashName){
  * @param HashName 
  * @param info （object）
  */  
-db.redisHmset = function(HashName,info){  
+db.redisHmset = function(HashName,info,expire){
     return new Promise(async function (resolve, reject) {
         client.select(redisName.toString(), function(error){  
             client.hmset(HashName, info,function(error, result){
                 if(error) {
                     reject(error);
                 } else {
+                    if (!isNaN(expire) && expire > 0) {
+                        client.expire(key, parseInt(expire));
+                    }
                     resolve(result);
                 }
             });
@@ -247,6 +250,24 @@ db.redisIncr = function(key){
     })
 }
 
+/**
+ * 查询TTL
+ * @param key包含的键 （tweet_total_read_*）
+ */
+var redisTtl = function(key){
+    //调用unref（）将允许此程序在get命令完成后立即退出。否则只要客户端 - 服务器连接存在，客户端就会挂起
+    // client.unref();
+    return new Promise(async function (resolve, reject) {
+        client.select(redisName.toString(), function(error){
+            client.ttl(key, function(err,result){
+                if (err) {
+                    reject(err)
+                }
+                resolve(result)
+            });
+        })
+    })
+}
 
 /** 
  * 断开redis 
